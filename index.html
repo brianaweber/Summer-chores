@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summer Days ☀️</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sun: #FFB830; --sky: #4FC3F7; --green: #66BB6A;
+    --pink: #F48FB1; --purple: #CE93D8; --coral: #FF8A65;
+    --bg: #FFF8EE; --text: #3D2C2C; --soft: #7B6B6B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 40px; }
+
+  header {
+    background: linear-gradient(135deg, var(--sun) 0%, var(--coral) 60%, var(--pink) 100%);
+    padding: 24px 20px 18px; text-align: center; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: "☀️"; position: absolute; font-size: 120px; opacity: 0.12;
+    top: -20px; right: -20px; animation: spin 20s linear infinite;
+  }
+  @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  header h1 { font-family: 'Fredoka One', cursive; font-size: 2.4rem; color: white; text-shadow: 2px 3px 0px rgba(0,0,0,0.12); }
+  header p { color: rgba(255,255,255,0.9); font-size: 1rem; font-weight: 700; margin-top: 4px; }
+
+  .date-bar { background: white; text-align: center; padding: 10px; font-weight: 800; font-size: 1rem; color: var(--coral); border-bottom: 2px dashed var(--sun); }
+
+  .tabs { display: flex; overflow-x: auto; padding: 16px 12px 0; gap: 8px; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex: 0 0 auto; padding: 10px 18px; border-radius: 999px;
+    font-family: 'Fredoka One', cursive; font-size: 1rem; cursor: pointer;
+    border: 3px solid transparent; transition: all 0.2s;
+    background: white; color: var(--soft); box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .tab.active { color: white; box-shadow: 0 4px 14px rgba(0,0,0,0.15); transform: translateY(-2px); }
+  .tab[data-kid="0"].active { background: var(--sky); border-color: #29B6F6; }
+  .tab[data-kid="1"].active { background: var(--green); border-color: #43A047; }
+  .tab[data-kid="2"].active { background: var(--pink); border-color: #E91E8C; }
+  .tab[data-kid="3"].active { background: var(--purple); border-color: #AB47BC; }
+  .tab[data-kid="4"].active { background: var(--coral); border-color: #F4511E; }
+  .tab[data-kid="mom"].active { background: #37474F; border-color: #263238; }
+
+  .content { padding: 16px 14px; max-width: 600px; margin: 0 auto; }
+
+  .card {
+    background: white; border-radius: 20px; padding: 18px 20px;
+    margin-bottom: 14px; box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    position: relative; overflow: hidden;
+  }
+  .card-label { font-family: 'Fredoka One', cursive; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+  .verse-card { background: linear-gradient(135deg, #E8F5E9, #F1F8E9); border-left: 5px solid var(--green); }
+  .verse-text { font-size: 1rem; font-style: italic; color: #2E7D32; font-weight: 700; line-height: 1.5; }
+  .verse-ref { font-size: 0.85rem; color: #558B2F; margin-top: 6px; font-weight: 800; }
+
+  .activity-card { background: linear-gradient(135deg, #E3F2FD, #EDE7F6); border-left: 5px solid var(--sky); }
+  .activity-box {
+    background: white; border-radius: 12px; padding: 14px; text-align: center;
+    font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--sky);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  .must-card { background: linear-gradient(135deg, #FFF3E0, #FBE9E7); border-left: 5px solid var(--sun); }
+  .check-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 0;
+    border-bottom: 1px dashed #F0D9C8; cursor: pointer;
+  }
+  .check-row:last-child { border-bottom: none; }
+  .checkbox {
+    width: 26px; height: 26px; border-radius: 8px; border: 2.5px solid var(--sun);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s; font-size: 16px;
+  }
+  .check-row.done .checkbox { background: var(--green); border-color: var(--green); color: white; }
+  .check-row.done .row-label { text-decoration: line-through; color: #aaa; }
+  .row-label { font-weight: 700; font-size: 0.95rem; }
+
+  .chore-card { border-left: 5px solid var(--coral); }
+  .chore-pair-label {
+    font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: #aaa; margin: 10px 0 4px; padding-top: 8px;
+    border-top: 1px dashed #F0E0D8;
+  }
+  .chore-pair-label:first-of-type { border-top: none; margin-top: 0; }
+
+  /* Points badge */
+  .points-card { background: linear-gradient(135deg, #FFFDE7, #FFF9C4); border-left: 5px solid var(--sun); }
+  .points-display { display: flex; align-items: center; justify-content: space-between; }
+  .points-number { font-family: 'Fredoka One', cursive; font-size: 3rem; line-height: 1; }
+  .points-label { font-size: 0.8rem; font-weight: 800; color: var(--soft); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .points-right { text-align: right; }
+  .points-today { font-size: 0.85rem; font-weight: 800; color: var(--soft); }
+  .streak-badge {
+    display: inline-block; background: var(--coral); color: white;
+    border-radius: 999px; padding: 4px 12px; font-family: 'Fredoka One', cursive;
+    font-size: 0.9rem; margin-top: 6px;
+  }
+
+  /* Progress */
+  .progress-bar-bg { height: 12px; background: #F0E8E0; border-radius: 999px; overflow: hidden; margin-top: 8px; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--sun), var(--coral)); border-radius: 999px; transition: width 0.4s ease; }
+  .progress-text { font-size: 0.8rem; font-weight: 800; color: var(--soft); margin-top: 4px; text-align: right; }
+
+  /* Notes from Mom */
+  .notes-card { background: linear-gradient(135deg, #F3E5F5, #EDE7F6); border-left: 5px solid var(--purple); }
+  .notes-bubble {
+    background: white; border-radius: 14px; padding: 14px;
+    font-size: 0.95rem; font-weight: 700; line-height: 1.6;
+    color: #4A148C; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    min-height: 50px; white-space: pre-wrap;
+  }
+  .notes-empty { color: #B0A0C0; font-style: italic; font-weight: 600; }
+
+  /* Mom view */
+  .mom-card {
+    background: white; border-radius: 20px; padding: 16px 18px;
+    margin-bottom: 14px; box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  }
+  .mom-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .mom-kid-name { font-family: 'Fredoka One', cursive; font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+  .mom-pct { font-family: 'Fredoka One', cursive; font-size: 1.1rem; }
+  .mom-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 700; padding: 4px 0; border-bottom: 1px dashed #F0E8E0; }
+  .mom-row:last-child { border-bottom: none; }
+  .dot { width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .dot.done { background: var(--green); color: white; }
+  .dot.todo { background: #EEE; border: 2px solid #DDD; }
+  .mom-row.done-row span { color: #aaa; text-decoration: line-through; }
+  .mom-bar-bg { height: 8px; background: #F0E0D8; border-radius: 999px; overflow: hidden; margin-top: 8px; }
+  .mom-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+  .mom-points-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.85rem; font-weight: 800; }
+
+  /* Mom notes editor */
+  .notes-editor { width: 100%; border: 2px solid #E1D0F0; border-radius: 12px; padding: 12px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700; color: #4A148C; resize: vertical; min-height: 70px; outline: none; }
+  .notes-editor:focus { border-color: var(--purple); }
+  .save-note-btn {
+    margin-top: 8px; padding: 8px 20px; border-radius: 999px; border: none;
+    background: var(--purple); color: white; font-family: 'Fredoka One', cursive;
+    font-size: 1rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+  .kid-note-label { font-family: 'Fredoka One', cursive; font-size: 1rem; margin: 12px 0 6px; color: #7B1FA2; }
+
+  .refresh-btn {
+    display: block; margin: 0 auto 16px; background: #37474F; color: white;
+    border: none; border-radius: 999px; padding: 10px 24px;
+    font-family: 'Fredoka One', cursive; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+
+  @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+  footer { text-align: center; color: #C9B0A0; font-size: 0.78rem; margin-top: 10px; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>☀️ Summer Days</h1>
+  <p>The Wellness Collective Kids Edition</p>
+</header>
+<div class="date-bar" id="datebar"></div>
+<div class="tabs" id="tabs"></div>
+<div class="content" id="content"></div>
+<footer>Made with ❤️ by Mom</footer>
+
+<script>
+// ============================================================
+// KIDS
+// ============================================================
+const KIDS = [
+  { name: "Levi",      emoji: "🌊", momName: "Mom" },
+  { name: "Jaymo",     emoji: "🌿", momName: "Bri" },
+  { name: "Riley",     emoji: "🌸", momName: "Bri" },
+  { name: "Anna",      emoji: "⭐", momName: "Mom" },
+  { name: "Charlotte", emoji: "🦋", momName: "Mom" },
+];
+const KID_COLORS = ["#4FC3F7","#66BB6A","#F48FB1","#CE93D8","#FF8A65"];
+
+// ============================================================
+// CHORE PAIRS — each kid gets one pair per day, rotating evenly
+// ============================================================
+const CHORE_PAIRS = [
+  { id: "laundry",   label1: "Fold a load of laundry",       emoji1: "👕", label2: "Put away the laundry",          emoji2: "🗂️" },
+  { id: "dishes",    label1: "Wash the dishes",               emoji1: "🍽️", label2: "Dry & put away dishes",         emoji2: "🧺" },
+  { id: "bathroom",  label1: "Clean sink & mirror",           emoji1: "🪥", label2: "Clean the toilet",               emoji2: "🚽" },
+  { id: "floors",    label1: "Sweep or vacuum",               emoji1: "🧹", label2: "Wipe down kitchen counters",    emoji2: "✨" },
+  { id: "trash",     label1: "Take out trash & recycling",    emoji1: "🗑️", label2: "Replace trash bags & tidy bin", emoji2: "♻️" },
+];
+
+// ============================================================
+// VERSES
+// ============================================================
+const VERSES = [
+  { text: "I can do all things through Christ who strengthens me.", ref: "Philippians 4:13" },
+  { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11" },
+  { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref: "Joshua 1:9" },
+  { text: "The Lord is my shepherd; I shall not want.", ref: "Psalm 23:1" },
+  { text: "Trust in the Lord with all your heart and lean not on your own understanding.", ref: "Proverbs 3:5" },
+  { text: "Love one another as I have loved you.", ref: "John 13:34" },
+  { text: "Do not be anxious about anything, but in every situation present your requests to God.", ref: "Philippians 4:6" },
+  { text: "Give thanks to the Lord, for He is good; His love endures forever.", ref: "Psalm 107:1" },
+  { text: "She is clothed with strength and dignity; she can laugh at the days to come.", ref: "Proverbs 31:25" },
+  { text: "Let all that you do be done in love.", ref: "1 Corinthians 16:14" },
+  { text: "The joy of the Lord is your strength.", ref: "Nehemiah 8:10" },
+  { text: "Even youths grow tired and weary, but those who hope in the Lord will renew their strength.", ref: "Isaiah 40:31" },
+  { text: "Above all, clothe yourselves with love, which binds us all together in perfect harmony.", ref: "Colossians 3:14" },
+  { text: "A cheerful heart is good medicine.", ref: "Proverbs 17:22" },
+  { text: "Children are a heritage from the Lord, offspring a reward from him.", ref: "Psalm 127:3" },
+  { text: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you.", ref: "Ephesians 4:32" },
+  { text: "Let your light shine before others, that they may see your good deeds.", ref: "Matthew 5:16" },
+  { text: "Do to others as you would have them do to you.", ref: "Luke 6:31" },
+  { text: "Whatever you do, work at it with all your heart, as working for the Lord.", ref: "Colossians 3:23" },
+  { text: "Start children off on the way they should go, and even when they are old they will not turn from it.", ref: "Proverbs 22:6" },
+  { text: "This is the day the Lord has made; let us rejoice and be glad in it.", ref: "Psalm 118:24" },
+];
+
+// ============================================================
+// ACTIVITIES
+// ============================================================
+const ACTIVITIES = [
+  "🚴 Bike Ride — at least 20 minutes",
+  "🚶 Walk outside — at least 20 minutes",
+  "🏋️ Workout with Mom's routine",
+  "🤸 Trampoline time — at least 20 minutes",
+  "🚴 Bike Ride — explore a new route!",
+  "🚶 Walk — invite a sibling along",
+  "🤸 Trampoline + stretching combo",
+  "🏋️ Bodyweight workout — pushups, squats, planks",
+];
+
+// ============================================================
+// DAILY MUSTS
+// ============================================================
+const DAILY_MUSTS = [
+  { id: "room",     label: "Tidy your room",             emoji: "🛏️" },
+  { id: "reading",  label: "Read OR do art for 20+ min", emoji: "📖" },
+  { id: "activity", label: "Do your daily activity",     emoji: "⚡" },
+];
+
+// Points per action
+const PTS_PER_TASK = 1;
+const PTS_BONUS_ALL_DONE = 3;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getDayIndex() {
+  const start = new Date("2026-06-01");
+  const today = new Date(); today.setHours(0,0,0,0); start.setHours(0,0,0,0);
+  return Math.max(0, Math.floor((today - start) / 86400000));
+}
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+function getChorePairForKid(kidIdx) {
+  const day = getDayIndex();
+  return CHORE_PAIRS[(day + kidIdx) % CHORE_PAIRS.length];
+}
+
+// Daily state (resets per day)
+function dayKey(kidIdx) { return `sd_day_${todayStr()}_kid${kidIdx}`; }
+function loadDayState(kidIdx) {
+  try { return JSON.parse(localStorage.getItem(dayKey(kidIdx))) || {}; } catch { return {}; }
+}
+function saveDayState(kidIdx, state) {
+  localStorage.setItem(dayKey(kidIdx), JSON.stringify(state));
+}
+
+// Persistent points (never resets)
+function loadPoints(kidIdx) {
+  return parseInt(localStorage.getItem(`sd_points_kid${kidIdx}`) || "0");
+}
+function savePoints(kidIdx, pts) {
+  localStorage.setItem(`sd_points_kid${kidIdx}`, pts);
+}
+
+// Per-kid notes (persistent, set by mom)
+function loadNote(kidIdx) {
+  return localStorage.getItem(`sd_note_kid${kidIdx}`) || "";
+}
+function saveNote(kidIdx, text) {
+  localStorage.setItem(`sd_note_kid${kidIdx}`, text);
+}
+
+// Track if bonus already awarded today
+function bonusKey(kidIdx) { return `sd_bonus_${todayStr()}_kid${kidIdx}`; }
+function bonusAwarded(kidIdx) { return localStorage.getItem(bonusKey(kidIdx)) === "1"; }
+function setBonus(kidIdx) { localStorage.setItem(bonusKey(kidIdx), "1"); }
+
+function getAllTaskIds(kidIdx) {
+  const pair = getChorePairForKid(kidIdx);
+  return [
+    ...DAILY_MUSTS.map(m => m.id),
+    `${pair.id}_1`,
+    `${pair.id}_2`,
+  ];
+}
+
+function getProgress(kidIdx) {
+  const state = loadDayState(kidIdx);
+  const ids = getAllTaskIds(kidIdx);
+  const done = ids.filter(id => !!state[id]).length;
+  return { done, total: ids.length, pct: Math.round((done / ids.length) * 100) };
+}
+
+// ============================================================
+// RENDER — KID VIEW
+// ============================================================
+let activeView = 0;
+
+function renderTabs() {
+  document.getElementById("tabs").innerHTML =
+    KIDS.map((kid, i) =>
+      `<div class="tab${activeView===i?' active':''}" data-kid="${i}" onclick="selectView(${i})">${kid.emoji} ${kid.name}</div>`
+    ).join("") +
+    `<div class="tab${activeView==='mom'?' active':''}" data-kid="mom" onclick="selectView('mom')">👩 Mom</div>`;
+}
+
+function renderContent() {
+  if (activeView === 'mom') { renderMomView(); return; }
+  const i = activeView;
+  const kid = KIDS[i];
+  const color = KID_COLORS[i];
+  const verse = VERSES[getDayIndex() % VERSES.length];
+  const activity = ACTIVITIES[(getDayIndex() + i) % ACTIVITIES.length];
+  const pair = getChorePairForKid(i);
+  const state = loadDayState(i);
+  const pts = loadPoints(i);
+  const note = loadNote(i);
+  const { done, total, pct } = getProgress(i);
+  const allDone = done === total;
+
+  document.body.style.background = "#FFF8EE";
+
+  const mustRows = DAILY_MUSTS.map(m => {
+    const isDone = !!state[m.id];
+    return `<div class="check-row${isDone?' done':''}" onclick="toggleTask('${m.id}')">
+      <div class="checkbox" style="${isDone?`background:${color};border-color:${color};color:white`:''}">${isDone?'✓':''}</div>
+      <span class="row-label">${m.emoji} ${m.label}</span>
+    </div>`;
+  }).join("");
+
+  const c1Done = !!state[`${pair.id}_1`];
+  const c2Done = !!state[`${pair.id}_2`];
+
+  const noteHtml = note
+    ? `<div class="notes-bubble">${note}</div>`
+    : `<div class="notes-bubble notes-empty">No message yet — check back! 💜</div>`;
+
+  document.getElementById("content").innerHTML = `
+    ${note || true ? `
+    <div class="card notes-card">
+      <div class="card-label" style="color:#7B1FA2">💜 Message from ${kid.momName}</div>
+      ${noteHtml}
+    </div>` : ''}
+
+    <div class="card verse-card">
+      <div class="card-label" style="color:#2E7D32">🌿 Today's Verse</div>
+      <div class="verse-text">"${verse.text}"</div>
+      <div class="verse-ref">— ${verse.ref}</div>
+    </div>
+
+    <div class="card activity-card">
+      <div class="card-label" style="color:#0288D1">⚡ Today's Activity</div>
+      <div class="activity-box">${activity}</div>
+    </div>
+
+    <div class="card must-card">
+      <div class="card-label" style="color:#E65100">✅ Daily Musts</div>
+      ${mustRows}
+    </div>
+
+    <div class="card chore-card" style="border-left:5px solid ${color}">
+      <div class="card-label" style="color:${color}">🧹 Your Chores Today</div>
+      <div class="check-row${c1Done?' done':''}" onclick="toggleTask('${pair.id}_1')">
+        <div class="checkbox" style="${c1Done?`background:${color};border-color:${color};color:white`:`border-color:${color}`}">${c1Done?'✓':''}</div>
+        <span class="row-label">${pair.emoji1} ${pair.label1}</span>
+      </div>
+      <div class="check-row${c2Done?' done':''}" onclick="toggleTask('${pair.id}_2')">
+        <div class="checkbox" style="${c2Done?`background:${color};border-color:${color};color:white`:`border-color:${color}`}">${c2Done?'✓':''}</div>
+        <span class="row-label">${pair.emoji2} ${pair.label2}</span>
+      </div>
+    </div>
+
+    <div class="card points-card">
+      <div class="card-label" style="color:#F57F17">⭐ ${kid.name}'s Points</div>
+      <div class="points-display">
+        <div>
+          <div class="points-number" style="color:${color}">${pts}</div>
+          <div class="points-label">total points</div>
+        </div>
+        <div class="points-right">
+          <div class="points-today">Today: ${done}/${total} tasks</div>
+          <div class="points-today" style="margin-top:4px">+1 per task · +3 bonus for all done</div>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${color},${color}bb)"></div>
+      </div>
+      <div class="progress-text">${pct}% today</div>
+      ${allDone ? `<div style="text-align:center;padding:14px 0 4px;font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);animation:bounce 0.6s ease">🎉 All done! Amazing, ${kid.name}! 🎉</div>` : ''}
+    </div>
+  `;
+}
+
+function toggleTask(itemId) {
+  const i = activeView;
+  const state = loadDayState(i);
+  const wasChecked = !!state[itemId];
+  state[itemId] = !wasChecked;
+  saveDayState(i, state);
+
+  // Update points
+  let pts = loadPoints(i);
+  if (!wasChecked) {
+    pts += PTS_PER_TASK;
+  } else {
+    pts = Math.max(0, pts - PTS_PER_TASK);
+  }
+
+  // Check if all done for bonus
+  const ids = getAllTaskIds(i);
+  const allNowDone = ids.every(id => !!state[id]);
+  if (allNowDone && !bonusAwarded(i)) {
+    pts += PTS_BONUS_ALL_DONE;
+    setBonus(i);
+  }
+  // If unchecking after bonus was given, don't remove bonus (it was earned)
+  savePoints(i, pts);
+  renderContent();
+}
+
+// ============================================================
+// RENDER — MOM VIEW
+// ============================================================
+function renderMomView() {
+  document.body.style.background = "#F0F4F8";
+
+  const allTotal = KIDS.length * 5; // 5 tasks each
+  const allDone = KIDS.reduce((sum, _, i) => sum + getProgress(i).done, 0);
+  const overallPct = Math.round((allDone / allTotal) * 100);
+
+  const kidCards = KIDS.map((kid, i) => {
+    const color = KID_COLORS[i];
+    const state = loadDayState(i);
+    const pair = getChorePairForKid(i);
+    const { done, total, pct } = getProgress(i);
+    const pts = loadPoints(i);
+
+    const rows = [
+      ...DAILY_MUSTS.map(m => {
+        const isDone = !!state[m.id];
+        return `<div class="mom-row${isDone?' done-row':''}">
+          <div class="dot ${isDone?'done':'todo'}">${isDone?'✓':''}</div>
+          <span>${m.emoji} ${m.label}</span>
+        </div>`;
+      }),
+      ...[
+        { id: `${pair.id}_1`, label: pair.label1, emoji: pair.emoji1 },
+        { id: `${pair.id}_2`, label: pair.label2, emoji: pair.emoji2 },
+      ].map(c => {
+        const isDone = !!state[c.id];
+        return `<div class="mom-row${isDone?' done-row':''}">
+          <div class="dot ${isDone?'done':'todo'}">${isDone?'✓':''}</div>
+          <span>${c.emoji} ${c.label}</span>
+        </div>`;
+      })
+    ].join("");
+
+    const note = loadNote(i);
+
+    return `<div class="mom-card" style="border-left:5px solid ${color}">
+      <div class="mom-card-header">
+        <div class="mom-kid-name" style="color:${color}">${kid.emoji} ${kid.name}</div>
+        <div class="mom-pct" style="color:${color}">${pct}% · ⭐${pts} pts</div>
+      </div>
+      <div>${rows}</div>
+      <div class="mom-bar-bg">
+        <div class="mom-bar-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+      <div class="kid-note-label">💜 Message to ${kid.name}</div>
+      <textarea class="notes-editor" id="note_${i}" placeholder="Leave ${kid.name} a note for today...">${note}</textarea>
+      <button class="save-note-btn" onclick="saveNoteFor(${i})">Save Note</button>
+    </div>`;
+  }).join("");
+
+  document.getElementById("content").innerHTML = `
+    <button class="refresh-btn" onclick="renderMomView()">🔄 Refresh</button>
+
+    <div class="card" style="background:linear-gradient(135deg,#37474F,#263238);color:white;text-align:center;margin-bottom:14px">
+      <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;opacity:0.8;margin-bottom:6px">Family Progress Today</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:2.8rem">${overallPct}%</div>
+      <div style="font-size:0.85rem;opacity:0.7;margin-top:4px">${allDone} of ${allTotal} tasks complete</div>
+      <div class="mom-bar-bg" style="margin-top:12px;background:rgba(255,255,255,0.15)">
+        <div class="mom-bar-fill" style="width:${overallPct}%;background:linear-gradient(90deg,var(--sun),var(--coral))"></div>
+      </div>
+    </div>
+
+    ${kidCards}
+  `;
+}
+
+function saveNoteFor(i) {
+  const text = document.getElementById(`note_${i}`).value.trim();
+  saveNote(i, text);
+  const btn = document.querySelector(`#note_${i} + button`);
+  if (btn) { btn.textContent = "Saved! ✓"; setTimeout(() => btn.textContent = "Save Note", 1500); }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function selectView(v) { activeView = v; renderTabs(); renderContent(); }
+
+function setDateBar() {
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById("datebar").textContent = new Date().toLocaleDateString('en-US', opts);
+}
+
+setDateBar();
+renderTabs();
+renderContent();
+</script>
+</body>
+</html>
